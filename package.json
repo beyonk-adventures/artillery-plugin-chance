@@ -1,6 +1,6 @@
 {
   "name": "artillery-plugin-chance",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Use chance.js in Artillery loadtest configurations",
   "main": "index.js",
   "files": [
