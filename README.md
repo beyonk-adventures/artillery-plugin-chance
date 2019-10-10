@@ -28,25 +28,24 @@ config:
 
 ### Example
 
-Creating a block called `chance` in config will allow you to set a series of variables using chance which will be changed (and used) in each request.
+Creating variables in the variables section of your config with the prefix defined by prefix (default `~`) will cause chance to be called for each of these variables, each request.
 
-It has been done this way rather than at the top level to prevent an expensive `Object.keys` search on the whole configuration, which might otherwise limit your ability to produce rapid requests at volume.
+Each item is either a simple string, which represents the chance function to call, or a hash containing a key `method` which defines the chance funciton. All other items in the hash are passed as a configuration hash to the method.
 
-Note that any conflicting variable names will overwrite the variables you have alrady defined at the top level.
+Note that any conflicting variable names (i.e. without prefix) will overwrite the variables you have alrady defined at the top level.
 
-Then, you can use these functions as you usually would in your scenarios:
+Then, you can use these variables as you usually would in your scenarios:
 
 ```yaml
 config:
   plugins:
     chance: {}
   variables:
-    chance:
-      - fullName: 'name'
-      - englishWithMiddle:
-          method: 'name'
-          middle: true
-          nationality: 'en'
+    - ~fullName: 'name'
+    - ~englishWithMiddle:
+        method: 'name'
+        middle: true
+        nationality: 'en'
   scenarios:
     - flow:
       - get:

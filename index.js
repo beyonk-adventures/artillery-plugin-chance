@@ -1,3 +1,5 @@
+'use strict'
+
 const debug = require('debug')('plugin:chance')
 const Chance = require('chance')
 const chance = Chance()
@@ -5,9 +7,13 @@ const chance = Chance()
 module.exports.Plugin = ChancePlugin
 module.exports.pluginInterfaceVersion = 2
 
+let prefix
+
 function ChancePlugin (script, events) {
   this.script = script
   this.events = events
+
+  prefix = script.config.plugins.chance.prefix || '~'
 
   script.config.processor = script.config.processor || {}
   script.config.processor.createVariables = createVariables
@@ -31,29 +37,25 @@ function createVariables (req, userContext, events, done) {
     cb = events
   }
 
-  const variables = ctx.vars
+  let variables = ctx.vars
+  if (variables && Object.keys(variables).length) {
+    Object.keys(variables).forEach(key => {
+      if (key[0] !== prefix) { return }
+      let value = variables[key]
+      let complex = typeof value === 'object'
+      let conf = complex ? { ...value } : {}
+      let method = complex ? conf.method : value
 
-  if (!variables || variables.length === 0 || !variables.chance) {
-    debug('No variables found! Do you have a `chance` block in your variables?')
-    return cb()
+      if (complex) {
+        delete conf.method
+      }
+
+      let realKey = key.slice(1)
+      debug(`Calling chance: chance.${method}(${JSON.stringify(conf)})`)
+      variables[realKey] = chance[method](conf)
+      debug(`Created variable: ${realKey} -> ${variables[realKey]}`)
+    })
   }
-
-  const chanceConfig = variables.chance
-
-  Object.keys(chanceConfig).forEach(key => {
-    const value = chanceConfig[key]
-    const complex = typeof value === 'object'
-    const conf = complex ? { ...value } : {}
-    const method = complex ? conf.method : value
-
-    if (complex) {
-      delete conf.method
-    }
-
-    debug(`Calling chance: chance.${method}(${JSON.stringify(conf)})`)
-    variables[key] = chance[method](conf)
-    debug(`Created variable: ${key} -> ${variables[key]}`)
-  })
 
   return cb()
 }
