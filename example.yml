@@ -1,23 +1,17 @@
 config:
-  target: "http://localhost:3000"
-  phases:
-    - duration: 10
-      arrivalRate: 1
   plugins:
-    faker:
-      locale: de
+    chance: {}
   variables:
-    title: '$faker.name.title'
-    firstName: '$faker.name.firstName'
-    lastName: '$faker.name.lastName'
-
-scenarios:
-  - flow:
-    - get:
-        url: "/search?q={{ lastName }}"
-  - flow:
-    - get:
-        url: "/search?q={{ firstName }}"
-  - flow:
-    - get:
-        url: "/search?q={{ firstName }} {{ lastName }}"
+    chance:
+      - fullName: 'name'
+      - englishWithMiddle:
+          method: 'name'
+          middle: true
+          nationality: 'en'
+  scenarios:
+    - flow:
+      - get:
+          url: "/search?q={{ englishWithMiddle }}"
+    - flow:
+      - get:
+          url: "/search?q={{ fullName }}"
