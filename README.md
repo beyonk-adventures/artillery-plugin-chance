@@ -26,6 +26,18 @@ config:
     chance: {}
 ```
 
+### Config
+
+You can change the prefix for your chance variables:
+
+```yaml
+config:
+  plugins:
+    chance: {
+      prefix: '^'
+    }
+```
+
 ### Example
 
 Creating variables in the variables section of your config with the prefix defined by prefix (default `~`) will cause chance to be called for each of these variables, each request.
