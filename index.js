@@ -1,62 +1,59 @@
-const debug = require('debug')('plugin:faker');
-const faker = require('faker');
-const get = require('lodash.get');
+const debug = require('debug')('plugin:chance')
+const Chance = require('chance')
+const chance = Chance()
 
-module.exports.Plugin = FakerPlugin;
-module.exports.pluginInterfaceVersion = 2;
+module.exports.Plugin = ChancePlugin
+module.exports.pluginInterfaceVersion = 2
 
-function FakerPlugin (script, events) {
-  this.script = script;
-  this.events = events;
-  this.locale = this.script.config.plugins.faker.locale;
+function ChancePlugin (script, events) {
+  this.script = script
+  this.events = events
 
-  if (this.locale) {
-    faker.locale = this.locale;
-    debug('Locale set to', this.locale);
-  }
-
-  script.config.processor = script.config.processor || {};
-  script.config.processor.fakerPluginCreateVariables = fakerPluginCreateVariables;
+  script.config.processor = script.config.processor || {}
+  script.config.processor.createVariables = createVariables
 
   script.scenarios.forEach(scenario => {
-    scenario.beforeRequest = scenario.beforeRequest || [];
-    scenario.beforeRequest.push('fakerPluginCreateVariables');
-  });
+    scenario.beforeRequest = scenario.beforeRequest || []
+    scenario.beforeRequest.push('createVariables')
+  })
 
-  debug('Plugin initialized');
-  return this;
+  debug('Plugin initialized')
+  return this
 }
 
-function fakerPluginCreateVariables (req, userContext, events, done) {
-  let ctx = userContext;
-  let cb = done;
+function createVariables (req, userContext, events, done) {
+  let ctx = userContext
+  let cb = done
 
   if (arguments.length === 3) {
     // called as a "function"
-    ctx = req;
-    cb = events;
+    ctx = req
+    cb = events
   }
 
-  const variables = ctx.vars;
+  const variables = ctx.vars
 
-  if (!variables || variables.length === 0) {
-    return cb();
+  if (!variables || variables.length === 0 || !variables.chance) {
+    debug('No variables found! Do you have a `chance` block in your variables?')
+    return cb()
   }
 
-  Object.keys(variables).forEach(key => {
-    const val = variables[key];
+  const chanceConfig = variables.chance
 
-    if (/\$faker\.[A-Za-z.]+$/.test(val)) {
-      const path = val.replace('$faker.', '');
-      const func = get(faker, path);
+  Object.keys(chanceConfig).forEach(key => {
+    const value = chanceConfig[key]
+    const complex = typeof value === 'object'
+    const conf = complex ? { ...value } : {}
+    const method = complex ? conf.method : value
 
-      if (func && typeof func === 'function') {
-        const fakedValue = func();
-        variables[key] = fakedValue;
-        debug(`fakerPluginCreateVariables: ${path} -> ${fakedValue}`);
-      }
+    if (complex) {
+      delete conf.method
     }
-  });
 
-  return cb();
+    debug(`Calling chance: chance.${method}(${JSON.stringify(conf)})`)
+    variables[key] = chance[method](conf)
+    debug(`Created variable: ${key} -> ${variables[key]}`)
+  })
+
+  return cb()
 }

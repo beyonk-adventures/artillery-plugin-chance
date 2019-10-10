@@ -1,7 +1,7 @@
 {
-  "name": "artillery-plugin-faker",
-  "version": "2.0.1",
-  "description": "Use faker.js in Artillery loadtest configurations",
+  "name": "artillery-plugin-chance",
+  "version": "0.0.0",
+  "description": "Use chance.js in Artillery loadtest configurations",
   "main": "index.js",
   "files": [
     "index.js"
@@ -12,30 +12,37 @@
     "lodash.get": "^4.4.2"
   },
   "devDependencies": {
+    "@beyonk/eslint-config": "^4.0.1",
     "ava": "^2.4.0",
+    "chance": "^1.1.3",
+    "eslint": "^6.5.1",
     "require-no-cache": "^0.2.1",
     "semistandard": "^14.2.0"
   },
   "scripts": {
-    "test": "ava",
     "precommit": "npm run lint",
-    "lint": "semistandard"
+    "lint": "standard"
   },
   "keywords": [
+    "chance",
     "faker",
+    "data-generation",
     "artillery",
     "loadtest"
   ],
-  "author": "Fabian Schneider <fabbbbbi+git@googlemail.com>",
+  "eslintConfig": {
+    "extends": "@beyonk"
+  },
+  "author": "Antony Jones <antony@beyonk.com>",
   "license": "MPL-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fabsrc/artillery-plugin-faker"
+    "url": "https://github.com/beyonk-adventures/artillery-plugin-chance"
   },
   "bugs": {
-    "url": "https://github.com/fabsrc/artillery-plugin-faker/issues"
+    "url": "https://github.com/beyonk-adventures/artillery-plugin-chance/issues"
   },
-  "homepage": "https://github.com/fabsrc/artillery-plugin-faker#readme",
+  "homepage": "https://github.com/beyonk-adventures/artillery-plugin-chance#readme",
   "engines": {
     "node": ">= 8"
   }
